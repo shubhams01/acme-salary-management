@@ -76,3 +76,4 @@ Root scripts `npm run build:api`, `npm run build:web`, `npm run typecheck:api`, 
 - Assumptions
 - Engineering trade-offs
 - AI-assisted development approach
+- [Vercel deployment](docs/deployment/vercel.md)
