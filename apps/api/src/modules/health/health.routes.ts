@@ -3,7 +3,6 @@ import { prisma } from "../../config/database";
 
 const router = Router();
 
-// Liveness check
 router.get("/live", (_req, res) => {
   res.status(200).json({
     success: true,
@@ -11,7 +10,6 @@ router.get("/live", (_req, res) => {
   });
 });
 
-// Readiness check
 router.get("/ready", async (_req, res, next) => {
   try {
     await prisma.$queryRaw`SELECT 1`;

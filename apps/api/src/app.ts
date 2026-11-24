@@ -1,8 +1,11 @@
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
+import cookieParser from "cookie-parser";
 
 import healthRoutes from "./modules/health/health.routes";
+import authRoutes from "./modules/auth/auth.routes";
+
 import {
   errorHandler,
   notFoundHandler,
@@ -20,8 +23,8 @@ app.use(
 );
 
 app.use(express.json({ limit: "1mb" }));
-
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 app.get("/", (_req, res) => {
   res.json({
@@ -32,6 +35,7 @@ app.get("/", (_req, res) => {
 });
 
 app.use("/api/v1/health", healthRoutes);
+app.use("/api/v1/auth", authRoutes);
 
 app.use(notFoundHandler);
 app.use(errorHandler);
