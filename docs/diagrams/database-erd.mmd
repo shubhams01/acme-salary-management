@@ -1,0 +1,87 @@
+
+erDiagram
+    ROLE ||--o{ USER : assigned
+    COUNTRY ||--o{ EMPLOYEE : contains
+    DEPARTMENT ||--o{ EMPLOYEE : employs
+    DESIGNATION ||--o{ EMPLOYEE : defines
+    EMPLOYEE ||--o| SALARY : receives
+    SALARY ||--o{ SALARY_REVISION : contains
+    SALARY_REVISION ||--o{ SALARY_COMPONENT : contains
+    CURRENCY ||--o{ SALARY_REVISION : denominates
+    USER ||--o{ AUDIT_LOG : creates
+
+    ROLE {
+        uuid id PK
+        string name UK
+    }
+
+    USER {
+        uuid id PK
+        string email UK
+        string password_hash
+        uuid role_id FK
+    }
+
+    COUNTRY {
+        uuid id PK
+        string name
+        string code UK
+    }
+
+    DEPARTMENT {
+        uuid id PK
+        string name
+    }
+
+    DESIGNATION {
+        uuid id PK
+        string title
+    }
+
+    EMPLOYEE {
+        uuid id PK
+        string employee_code UK
+        string first_name
+        string last_name
+        string email UK
+        uuid country_id FK
+        uuid department_id FK
+        uuid designation_id FK
+        string status
+    }
+
+    CURRENCY {
+        uuid id PK
+        string code UK
+        string name
+    }
+
+    SALARY {
+        uuid id PK
+        uuid employee_id FK
+    }
+
+    SALARY_REVISION {
+        uuid id PK
+        uuid salary_id FK
+        uuid currency_id FK
+        decimal base_salary
+        decimal gross_salary
+        date effective_from
+        date effective_to
+    }
+
+    SALARY_COMPONENT {
+        uuid id PK
+        uuid salary_revision_id FK
+        string name
+        string type
+        decimal amount
+    }
+
+    AUDIT_LOG {
+        uuid id PK
+        uuid user_id FK
+        string action
+        json metadata
+    }
