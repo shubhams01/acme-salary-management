@@ -1,0 +1,163 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum EmployeeStatus {
+  ACTIVE
+  INACTIVE
+  ON_LEAVE
+  TERMINATED
+}
+
+enum ComponentType {
+  BASE
+  ALLOWANCE
+  BONUS
+  DEDUCTION
+}
+
+enum AuditAction {
+  EMPLOYEE_CREATED
+  EMPLOYEE_UPDATED
+  EMPLOYEE_STATUS_CHANGED
+  SALARY_CREATED
+  SALARY_REVISED
+}
+
+model Role {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String   @unique
+  users     User[]
+  createdAt DateTime @default(now())
+}
+
+model User {
+  id           String      @id @default(uuid()) @db.Uuid
+  email        String      @unique
+  passwordHash String
+  roleId       String      @db.Uuid
+  role         Role        @relation(fields: [roleId], references: [id])
+  auditLogs    AuditLog[]
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  @@index([roleId])
+}
+
+model Country {
+  id        String     @id @default(uuid()) @db.Uuid
+  name      String
+  code      String     @unique
+  employees Employee[]
+}
+
+model Department {
+  id        String     @id @default(uuid()) @db.Uuid
+  name      String     @unique
+  employees Employee[]
+}
+
+model Designation {
+  id        String     @id @default(uuid()) @db.Uuid
+  title     String     @unique
+  employees Employee[]
+}
+
+model Currency {
+  id          String           @id @default(uuid()) @db.Uuid
+  code        String           @unique
+  name        String
+  symbol      String
+  revisions   SalaryRevision[]
+}
+
+model Employee {
+  id            String         @id @default(uuid()) @db.Uuid
+  employeeCode  String         @unique
+  firstName     String
+  lastName      String
+  email         String         @unique
+  countryId     String         @db.Uuid
+  departmentId  String         @db.Uuid
+  designationId String         @db.Uuid
+  status        EmployeeStatus @default(ACTIVE)
+
+  country       Country        @relation(fields: [countryId], references: [id])
+  department    Department     @relation(fields: [departmentId], references: [id])
+  designation   Designation    @relation(fields: [designationId], references: [id])
+  salary        Salary?
+  auditLogs     AuditLog[]
+
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  @@index([countryId])
+  @@index([departmentId])
+  @@index([designationId])
+  @@index([status])
+  @@index([status, departmentId])
+}
+
+model Salary {
+  id        String           @id @default(uuid()) @db.Uuid
+  employeeId String          @unique @db.Uuid
+  employee  Employee         @relation(fields: [employeeId], references: [id])
+  revisions SalaryRevision[]
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+}
+
+model SalaryRevision {
+  id            String            @id @default(uuid()) @db.Uuid
+  salaryId      String            @db.Uuid
+  currencyId    String            @db.Uuid
+
+  baseSalary    Decimal           @db.Decimal(19, 4)
+  grossSalary   Decimal           @db.Decimal(19, 4)
+  netSalary     Decimal           @db.Decimal(19, 4)
+
+  effectiveFrom DateTime          @db.Date
+  effectiveTo   DateTime?         @db.Date
+
+  salary        Salary            @relation(fields: [salaryId], references: [id])
+  currency      Currency          @relation(fields: [currencyId], references: [id])
+  components    SalaryComponent[]
+
+  createdAt     DateTime          @default(now())
+
+  @@unique([salaryId, effectiveFrom])
+  @@index([salaryId, effectiveFrom])
+  @@index([currencyId])
+}
+
+model SalaryComponent {
+  id               String         @id @default(uuid()) @db.Uuid
+  salaryRevisionId String         @db.Uuid
+  name             String
+  type             ComponentType
+  amount           Decimal        @db.Decimal(19, 4)
+
+  revision         SalaryRevision @relation(fields: [salaryRevisionId], references: [id])
+
+  @@index([salaryRevisionId])
+}
+
+model AuditLog {
+  id         String      @id @default(uuid()) @db.Uuid
+  userId     String      @db.Uuid
+  employeeId String?     @db.Uuid
+  action     AuditAction
+  metadata   Json?
+  createdAt  DateTime    @default(now())
+
+  user       User        @relation(fields: [userId], references: [id])
+  employee   Employee?   @relation(fields: [employeeId], references: [id])
+
+  @@index([userId, createdAt])
+  @@index([employeeId, createdAt])
+}
