@@ -18,7 +18,7 @@ import {
 } from "@mantine/core";
 
 const API_URL =
-  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000/api/v1";
+  process.env.NEXT_PUBLIC_API_URL ?? "/api/v1";
 
 type User = { id: string; email: string; role: string };
 type EmployeeStatus = "ACTIVE" | "INACTIVE" | "ON_LEAVE" | "TERMINATED";
