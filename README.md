@@ -9,8 +9,7 @@ A web-based employee compensation management platform designed for organizations
 - TypeScript
 - PostgreSQL
 - Prisma ORM
-- Tailwind CSS
-- shadcn/ui
+- Mantine
 
 ## Planned MVP Features
 
@@ -34,8 +33,14 @@ apps/
       modules/
         auth/
         health/
+        employees/
+        salary/
+        analytics/
+        audit/
     tests/
-  web/ (planned)
+  web/
+    app/
+    components/
 
 docs/
   requirements.md
@@ -47,20 +52,22 @@ docs/
 
 ## Development Status
 
-The repository contains the MVP requirements and architecture docs plus an in-progress API foundation (health checks, HR authentication scaffolding, Prisma schema, and administrator seed). Employee CRUD, salary workflows, analytics, audit endpoints, and the web application remain to be implemented; they are defined in the product documentation but are not yet available.
+The app has an HR sign-in, employee directory, employee create/edit/status actions, salary creation and revision history, and a currency-aware compensation dashboard. The API includes audit events, employee and salary endpoints, grouped analytics, a PostgreSQL migration, and a deterministic 10,000-employee seed. Deployment and the demo video remain delivery work.
 
-## Local API Setup
+## Local Setup
 
 1. Install dependencies from the repository root with `npm install`.
-2. Copy `apps/api/.env.example` to `apps/api/.env` and set the local values.
+2. Copy `apps/api/.env.example` to `apps/api/.env` and set secure local values. Copy `apps/web/.env.example` to `apps/web/.env.local` if the API URL differs from its default.
 3. Start PostgreSQL with `npm run db:up`.
 4. Generate the Prisma client with `npm run prisma:generate --workspace=@acme/api`.
-5. Apply the development migration with `npm run db:migrate`.
-6. Start the API with `npm run dev:api`.
+5. Apply the checked-in migration with `npm run db:migrate`.
+6. Load the 10,000 synthetic employees and salary snapshots with `npm run db:seed`.
+7. Create the initial HR administrator with `npm run db:seed:admin`.
+8. Start the API and web app in separate terminals with `npm run dev:api` and `npm run dev:web`.
 
-The API listens on port 4000 by default. Liveness and readiness endpoints are available at `/api/v1/health/live` and `/api/v1/health/ready`.
+The API listens on port 4000 and the web app on port 3000 by default. Liveness and readiness endpoints are available at `/api/v1/health/live` and `/api/v1/health/ready`.
 
-Root scripts `npm run build:api`, `npm run typecheck:api`, and `npm run test:api` target the API workspace.
+Root scripts `npm run build:api`, `npm run build:web`, `npm run typecheck:api`, `npm run typecheck:web`, and `npm run test:api` target the respective workspaces.
 
 ## Documentation
 

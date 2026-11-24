@@ -3,16 +3,23 @@
   "version": "1.0.0",
   "private": true,
   "workspaces": [
-    "apps/api"
+    "apps/api",
+    "apps/web"
   ],
   "scripts": {
     "dev:api": "npm run dev --workspace=@acme/api",
     "build:api": "npm run build --workspace=@acme/api",
     "test:api": "npm run test --workspace=@acme/api",
     "typecheck:api": "npm run typecheck --workspace=@acme/api",
+    "dev:web": "npm run dev --workspace=@acme/web",
+    "build:web": "npm run build --workspace=@acme/web",
+    "typecheck:web": "npm run typecheck --workspace=@acme/web",
     "db:up": "docker compose -f docker-compose.yml up -d postgres",
     "db:down": "docker compose -f docker-compose.yml down",
     "db:migrate": "npm run prisma:migrate --workspace=@acme/api",
+    "db:deploy": "npm run prisma:migrate:deploy --workspace=@acme/api",
+    "db:seed": "npm run seed:data --workspace=@acme/api",
+    "db:seed:admin": "npm run seed:admin --workspace=@acme/api",
     "db:studio": "npm run prisma:studio --workspace=@acme/api"
   }
 }
