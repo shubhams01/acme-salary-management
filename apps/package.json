@@ -1,0 +1,19 @@
+{
+  "name": "acme-salary-management",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/api",
+    "apps/web"
+  ],
+  "scripts": {
+    "dev:api": "npm run dev --workspace=@acme/api",
+    "build:api": "npm run build --workspace=@acme/api",
+    "test:api": "npm run test --workspace=@acme/api",
+    "typecheck:api": "npm run typecheck --workspace=@acme/api",
+    "db:up": "docker compose up -d postgres",
+    "db:down": "docker compose down",
+    "db:migrate": "npm run prisma:migrate --workspace=@acme/api",
+    "db:studio": "npm run prisma:studio --workspace=@acme/api"
+  }
+}
