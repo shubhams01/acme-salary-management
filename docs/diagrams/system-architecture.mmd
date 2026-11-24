@@ -1,0 +1,24 @@
+
+flowchart TD
+    HR[HR Manager]
+    UI[Next.js React Frontend]
+    API[Express REST API]
+    AUTH[Authentication Middleware]
+    EMP[Employee Module]
+    SAL[Salary Module]
+    ANA[Analytics Module]
+    AUD[Audit Module]
+    DB[(PostgreSQL)]
+
+    HR --> UI
+    UI --> API
+    API --> AUTH
+    AUTH --> EMP
+    AUTH --> SAL
+    AUTH --> ANA
+    AUTH --> AUD
+
+    EMP --> DB
+    SAL --> DB
+    ANA --> DB
+    AUD --> DB
