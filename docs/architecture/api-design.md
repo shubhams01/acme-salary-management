@@ -2,24 +2,24 @@
 
 ## Authentication
 
-POST /auth/login  
-POST /auth/refresh  
-POST /auth/logout
+POST /api/v1/auth/login  
+POST /api/v1/auth/refresh  
+POST /api/v1/auth/logout
 
 ## Employees
 
-GET /employees  
-GET /employees/:id  
-POST /employees  
-PATCH /employees/:id  
-PATCH /employees/:id/status
+GET /api/v1/employees?page=1&pageSize=25&search=alex&status=ACTIVE  
+GET /api/v1/employees/:id  
+POST /api/v1/employees  
+PATCH /api/v1/employees/:id  
+PATCH /api/v1/employees/:id/status
 
 ## Organization
 
-GET /countries  
-GET /departments  
-GET /designations  
-GET /currencies
+GET /api/v1/countries  
+GET /api/v1/departments  
+GET /api/v1/designations  
+GET /api/v1/currencies
 
 ## Salary
 

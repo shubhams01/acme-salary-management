@@ -4,6 +4,7 @@ import {
   Response,
   NextFunction,
 } from "express";
+import { Prisma } from "@prisma/client";
 
 export const notFoundHandler = (
   req: Request,
@@ -22,10 +23,15 @@ export const errorHandler: ErrorRequestHandler = (
   res,
   _next
 ) => {
+  const prismaStatusCode =
+    error instanceof Prisma.PrismaClientKnownRequestError
+      ? ({ P2002: 409, P2003: 400, P2025: 404 } as Record<string, number>)[
+          error.code
+        ]
+      : undefined;
   const statusCode =
-    typeof error.statusCode === "number"
-      ? error.statusCode
-      : 500;
+    prismaStatusCode ??
+    (typeof error.statusCode === "number" ? error.statusCode : 500);
 
   if (statusCode >= 500) {
     console.error(error);
@@ -36,6 +42,8 @@ export const errorHandler: ErrorRequestHandler = (
     message:
       statusCode >= 500
         ? "Internal server error"
-        : error.message,
+        : prismaStatusCode
+          ? "Request conflicts with existing or related data"
+          : error.message,
   });
 };
