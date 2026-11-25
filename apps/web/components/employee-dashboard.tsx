@@ -347,8 +347,8 @@ export default function EmployeeDashboard() {
         `/employees/${employee.id}/salary/history`
       );
       setSalaryHistory(result.data.revisions);
-    } catch {
-      // A new employee has no salary history yet.
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "Could not load salary history");
     }
   }
 

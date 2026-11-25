@@ -17,7 +17,6 @@ class SalaryServiceError extends Error {
 }
 
 function componentsForRevision(
-  revisionId: string,
   input: SalaryPackageInput
 ) {
   return [
@@ -28,7 +27,6 @@ function componentsForRevision(
     },
     ...input.components,
   ].map((component) => ({
-    salaryRevisionId: revisionId,
     name: component.name,
     type: component.type,
     amount: new Prisma.Decimal(component.amount),
@@ -78,8 +76,7 @@ export class SalaryService {
       },
     });
 
-    if (!salary) throw new SalaryServiceError("Salary record not found", 404);
-    return salary.revisions;
+    return salary?.revisions ?? [];
   }
 
   async getRevision(employeeId: string, revisionId: string) {
@@ -110,7 +107,7 @@ export class SalaryService {
               ...calculated,
               effectiveFrom: new Date(`${input.effectiveFrom}T00:00:00.000Z`),
               components: {
-                create: componentsForRevision(revisionId, input),
+                create: componentsForRevision(input),
               },
             },
           },
@@ -176,7 +173,7 @@ export class SalaryService {
             ...calculated,
             effectiveFrom,
             components: {
-              create: componentsForRevision(revisionId, input),
+              create: componentsForRevision(input),
             },
           },
           include: { currency: true, components: true },

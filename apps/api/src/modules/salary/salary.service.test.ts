@@ -83,9 +83,9 @@ describe("SalaryService", () => {
     expect(revision.netSalary.toString()).toBe("85000");
     expect(revision.effectiveFrom).toEqual(new Date("2026-03-01T00:00:00.000Z"));
     expect(revision.components.create).toEqual([
-      { salaryRevisionId: revision.id, name: "Base salary", type: "BASE", amount: new Prisma.Decimal("80000.25") },
-      { salaryRevisionId: revision.id, name: "Allowance", type: "ALLOWANCE", amount: new Prisma.Decimal("10000.25") },
-      { salaryRevisionId: revision.id, name: "Deduction", type: "DEDUCTION", amount: new Prisma.Decimal("5000.50") },
+      { name: "Base salary", type: "BASE", amount: new Prisma.Decimal("80000.25") },
+      { name: "Allowance", type: "ALLOWANCE", amount: new Prisma.Decimal("10000.25") },
+      { name: "Deduction", type: "DEDUCTION", amount: new Prisma.Decimal("5000.50") },
     ]);
     expect(tx.auditLog.create).toHaveBeenCalledWith({
       data: {
@@ -180,13 +180,14 @@ describe("SalaryService", () => {
     expect(tx.auditLog.create).not.toHaveBeenCalled();
   });
 
-  it("reads current salary, history, and revisions within the employee scope", async () => {
+  it("reads current salary, empty or populated history, and employee-scoped revisions", async () => {
     const revisions = [{ id: "revision-2" }, { id: "revision-1" }];
     const currentSalary = { id: "salary-1", revisions: [revisions[0]] };
     const revision = { id: "revision-2", salaryId: "salary-1" };
     vi.mocked(prisma.salary.findUnique)
       .mockResolvedValueOnce(currentSalary as never)
       .mockResolvedValueOnce({ revisions } as never)
+      .mockResolvedValueOnce(null)
       .mockResolvedValueOnce(null);
     vi.mocked(prisma.salaryRevision.findFirst).mockResolvedValueOnce(revision as never);
     const service = new SalaryService();
@@ -208,6 +209,7 @@ describe("SalaryService", () => {
       where: { employeeId },
       include: { revisions: { orderBy: { effectiveFrom: "desc" }, include: { currency: true, components: true } } },
     });
+    await expect(service.getHistory(employeeId)).resolves.toEqual([]);
     await expect(service.getRevision(employeeId, "revision-2")).resolves.toBe(revision);
     expect(prisma.salaryRevision.findFirst).toHaveBeenCalledWith({
       where: { id: "revision-2", salary: { employeeId } },
