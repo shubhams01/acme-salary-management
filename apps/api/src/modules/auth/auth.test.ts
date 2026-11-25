@@ -1,4 +1,5 @@
 import { beforeAll, describe, expect, it } from "vitest";
+import { loginSchema } from "./auth.validation";
 
 let authUtils: typeof import("./auth.utils");
 
@@ -36,5 +37,21 @@ describe("authentication token utilities", () => {
     expect(authUtils.hashRefreshToken(firstToken)).not.toBe(
       authUtils.hashRefreshToken(secondToken)
     );
+  });
+});
+
+describe("login request validation", () => {
+  it("trims a valid email while preserving the password exactly", () => {
+    expect(loginSchema.parse({ email: "  HR@example.com  ", password: " secure pass " })).toEqual({
+      email: "HR@example.com",
+      password: " secure pass ",
+    });
+  });
+
+  it("rejects malformed email, empty password, and overlong credentials", () => {
+    expect(loginSchema.safeParse({ email: "bad", password: "secret" }).success).toBe(false);
+    expect(loginSchema.safeParse({ email: "hr@example.com", password: "" }).success).toBe(false);
+    expect(loginSchema.safeParse({ email: "a".repeat(250) + "@example.com", password: "x" }).success).toBe(false);
+    expect(loginSchema.safeParse({ email: "hr@example.com", password: "x".repeat(129) }).success).toBe(false);
   });
 });
